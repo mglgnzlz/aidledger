@@ -6,34 +6,29 @@ contract AidLedger {
 
   struct ReliefGood {
     uint id;
-    string donor; // change to address instead of string later
+    string donor; // change to address later
     string description;
-    string location;
-    bool delivered;
+    string status;
+    string recipient; // change to address later
   }
 
   constructor() public {
-    createReliefGood("test donor", "test description", "test location");
+    createReliefGood("test donor", "test description", "test status", "test recipient");
   }
 
   // Create a new relief good
-  function createReliefGood(string memory _donor, string memory _description, string memory _location) public {
+  function createReliefGood(string memory _donor, string memory _description, string memory _status, string memory _recipient) public {
     reliefGoodCount++;
-    reliefGoods[reliefGoodCount] = ReliefGood(reliefGoodCount, _donor, _description, _location, false);
+    reliefGoods[reliefGoodCount] = ReliefGood(reliefGoodCount, _donor, _description, _status, _recipient);
   }
 
-  // Update relief good details
-  function updateReliefGoodLocation(uint _id, string memory _location) public {
-    reliefGoods[_id].location = _location;
-  }
-
-  // Mark relief good as delivered
-  function markAsDelivered(uint _id) public {
-    reliefGoods[_id].delivered = true;
+  // Update relief good status
+  function updateReliefGoodstatus(uint _id, string memory _status) public {
+    reliefGoods[_id].status = _status;
   }
 
   // Get relief good details
-  function getReliefGood(uint _id) public view returns (uint, string memory, string memory, string memory, bool) {
-    return (reliefGoods[_id].id, reliefGoods[_id].donor, reliefGoods[_id].description, reliefGoods[_id].location, reliefGoods[_id].delivered);
+  function getReliefGood(uint _id) public view returns (uint, string memory, string memory, string memory) {
+    return (reliefGoods[_id].id, reliefGoods[_id].donor, reliefGoods[_id].description, reliefGoods[_id].status);
   }
 }
