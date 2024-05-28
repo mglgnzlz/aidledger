@@ -1,11 +1,33 @@
 {% extends 'AidLedgerMainPage/baseTemplate.html' %}
 
 {% block sidebar %}
+<h2>Donator Dashboard</h2>
+<h3>GENERATE QR</h3>
+<a href="" class="button"><i class="fa-solid fa-database"></i> Generate QR</a>
+<h3>DONATION TRACKER </h3>
+<a href="" class="button"><i class="fa-solid fa-file"></i> Donation Tracker</a>
+
+    {% endblock %}
 
 
-{% endblock %}
+    {% block content %}
+
+    <h1>GENERATE QR CODE</h1>
+
+    <div class="inputFields">
+        <form action="">
+            <label for="rfgType">TYPE OF GOODS TO BE DONATED:</label>
+            <input type="text" id="rfgType" name="rfgType"><br><br>
+            <label for="rfgWeight">WEIGHT:</label>
+            <input type="text" id="rfgWeight" name="rfgWeight"><br><br>
+            <input type="submit" value="Generate QR Code">
+        </form>
+    </div>
+
+    <div class="qrcodeSection">
+        <h3 class="qrGen">QR CODE GENERATED</h3>
+        <button>DOWNLOAD</button>
+    </div>
 
 
-{% block content %} 
-
-{% endblock %}
+    {% endblock %}

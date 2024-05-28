@@ -27,7 +27,7 @@ def recipScanQR (request):
         
     }
     
-    return render(request, "AidLedgerMainPage/recipentDashboard.html", context)
+    return render(request, "AidLedgerMainPage/recipientDashboard.html", context)
 
 
 

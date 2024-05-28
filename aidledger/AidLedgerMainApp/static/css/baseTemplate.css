@@ -1,68 +1,74 @@
 body {
-    margin: 0; /* Reset default margin */
-    padding: 0; /* Reset default padding */
-    font-family: Monaco, monospace;
-  }
+  margin: 0;
+  /* Reset default margin */
+  padding: 0;
+  /* Reset default padding */
+  font-family: Helvetica, monospace;
+}
 
 .sidebar {
-    float: left;
-    width: 220px; /* width for the sidebar */
-    height: 110vh;
-    overflow: auto;
-    border-right: 2px solid #2d1a18;
-    box-sizing: border-box;
-  
-    h2 {
-      padding: 0px 20px;
-      font-weight: 700;
-    }
-  
-    h3 {
-      padding: 0px 20px;
-      font-weight: 700;
-    }
-    a {
-        padding: 8px 20px;
-        display: block;
-        color: #2d1a18;
-        text-decoration: none;
-        font-size: 16px;
-        font-weight: 500;
-      }
-    
-      a:hover {
-        background-color: #cfc2c2;
-      }
+  float: left;
+  width: 220px;
+  /* width for the sidebar */
+  height: 110vh;
+  padding-top: 15px;
+  overflow: hidden;
+  background-color: rgb(236, 234, 234);
+  /* border-right: 2px solid #2d1a18; */
+  box-sizing: border-box;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+ 
+  h2 {
+    padding: 0px 20px;
+    font-weight: 700;
+  }
+
+  h3 {
+    padding: 0px 20px;
+    font-weight: 700;
+  }
+
+  a {
+    padding: 8px 20px;
+    display: block;
+    color: #2d1a18;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  a:hover {
+    background-color: #cfc2c2;
+  }
 }
 
 
 
 .topnav {
-    overflow: hidden;
-  
-    a {
-      float: left;
-      color: #9b1111;
-      text-align: left;
-      padding: 16px;
-      padding-left: 64px;
-      text-decoration: none;
-      font-size: 24px;
-      font-weight: 700;
-    }
-  }
-  
-  /* DIVIDER */
-  .divider {
-    background-color: #2d1a18;
-    height: 8px;
-  }
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* Adding the drop shadow */
+}
+
+.topnav a {
+  float: left;
+  color: black;
+  text-align: left;
+  padding: 30px;
+  padding-left: 64px;
+  text-decoration: none;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* DIVIDER */
 
 
-  
+
 .content_section {
-    /* margin: auto; */
-    width: 80%;
-    margin-left: 20%;
-    padding: 16px 0px;
-  }
+  /* margin: auto; */
+  width: 80%;
+  margin-left: 20%;
+  padding: 16px 0px;
+}
