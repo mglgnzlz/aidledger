@@ -13,7 +13,8 @@ contract AidLedger {
   }
 
   constructor() public {
-    createReliefGood("test donor", "test description", "test status", "test recipient");
+    createReliefGood("Ced", "Hotdog", "Delivered", "Migs");
+    createReliefGood("Kyle", "Egg", "In transit", "Clarence");
   }
 
   // Create a new relief good
