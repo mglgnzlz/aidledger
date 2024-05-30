@@ -4,23 +4,33 @@ contract AidLedger {
   uint public reliefGoodCount = 0;
   mapping(uint => ReliefGood) public reliefGoods;
 
+  event ReliefGoodCreated(
+    uint id,
+    string donor,
+    string description,
+    string status,
+    string recipient
+  );
+
   struct ReliefGood {
     uint id;
-    string donor; // change to address later
+    string donor;
     string description;
     string status;
-    string recipient; // change to address later
+    string recipient;
   }
 
   constructor() public {
+    createReliefGood("Migs", "Hotdog", "In transit", "Clarence");
+    createReliefGood("Kyle", "Egg", "In transit", "Ced");
     createReliefGood("Ced", "Hotdog", "Delivered", "Migs");
-    createReliefGood("Kyle", "Egg", "In transit", "Clarence");
   }
 
   // Create a new relief good
   function createReliefGood(string memory _donor, string memory _description, string memory _status, string memory _recipient) public {
     reliefGoodCount++;
     reliefGoods[reliefGoodCount] = ReliefGood(reliefGoodCount, _donor, _description, _status, _recipient);
+    emit ReliefGoodCreated(reliefGoodCount, _donor, _description, _status, _recipient);
   }
 
   // Update relief good status

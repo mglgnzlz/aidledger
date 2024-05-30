@@ -31,11 +31,6 @@
       ul {
         margin-bottom: 0px;
       }
-
-      #completedTaskList .content {
-        color: grey;
-        text-decoration: line-through;
-      }
     </style>
   </head>
   <body>
@@ -56,16 +51,37 @@
             <p class="text-center">Loading...</p>
           </div>
           <div id="content">
-            <!-- <form onSubmit="App.createTask(); return false;">
+            <form onSubmit="App.createReliefGood(); return false;">
               <input
-                id="newTask"
+                id="donor"
                 type="text"
-                class="form-control"
-                placeholder="Add task..."
+                class="form-control mb-1"
+                placeholder="Donor"
                 required
               />
-              <input type="submit" hidden="" />
-            </form> -->
+              <input
+                id="description"
+                type="text"
+                class="form-control mb-1"
+                placeholder="Description"
+                required
+              />
+              <input
+                id="status"
+                type="text"
+                class="form-control mb-1"
+                placeholder="Status"
+                required
+              />
+              <input
+                id="recipient"
+                type="text"
+                class="form-control mb-1"
+                placeholder="Recipient"
+                required
+              />
+              <button type="submit" class="btn btn-primary">Create</button>
+            </form>
             <table id="reliefGoodList" class="table">
               <thead>
                 <tr>
@@ -88,7 +104,16 @@
                 </tr>
               </tbody>
             </table>
-            <ul id="completedTaskList" class="list-unstyled"></ul>
+            <table id="deliveredReliefGoodList" class="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Donor</th>
+                  <th>Description</th>
+                  <th>Status</th>
+                  <th>Recipient</th>
+                </tr>
+              </thead>
           </div>
         </main>
       </div>

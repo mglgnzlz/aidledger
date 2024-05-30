@@ -100,11 +100,35 @@ App = {
       $newReliefGoodTemplate.find(".status").html(reliefGoodStatus);
       $newReliefGoodTemplate.find(".recipient").html(reliefGoodRecipient);
 
-      $("#reliefGoodList").append($newReliefGoodTemplate);
+      if (reliefGoodStatus !== "Delivered") {
+        $("#reliefGoodList").append($newReliefGoodTemplate);
+      } else {
+        $("#deliveredReliefGoodList").append($newReliefGoodTemplate);
+      }
 
       // Show relief goods
       $newReliefGoodTemplate.show();
     }
+  },
+  createReliefGood: async () => {
+    App.setLoading(true);
+    const donor = $("#donor").val();
+    const description = $("#description").val();
+    const status = $("#status").val();
+    const recipient = $("#recipient").val();
+    console.log(
+      "Donor:",
+      donor,
+      "\nDescription:",
+      description,
+      "\nStatus:",
+      status,
+      "\nRecipient:",
+      recipient
+    );
+
+    await App.aidLedger.createReliefGood(donor, description, status, recipient);
+    window.location.reload();
   },
 
   setLoading: (boolean) => {
