@@ -43,11 +43,11 @@ class SignUpView(View):
 
             # Determine the redirect URL based on user type
             redirect_url = ''
-            if username == 'NGO/GOVT':
+            if userType == 'NGO/GOVT':
                 redirect_url = '/govgenqr/'
             elif userType == 'HANDLER':
                 redirect_url = '/handlerscanqr/'
-            elif accountName == 'RECIPIENT':
+            elif userType == 'RECIPIENT':
                 redirect_url = '/recipscanqr/'
 
             # Return a JSON response indicating success and the redirect URL
@@ -137,49 +137,51 @@ def request_message(request):
 def verify_message(request):
     try:
         data = json.loads(request.body)
-        print(data)
+        print("Received data:", data)
 
         REQUEST_URL = 'https://authapi.moralis.io/challenge/verify/evm'
-        x = requests.post(
+        response = requests.post(
             REQUEST_URL,
             json=data,
-            headers={'X-API-KEY': API_KEY})
+            headers={'X-API-KEY': API_KEY}
+        )
         
-        response_data = json.loads(x.text)
-        print(response_data)
-        print(x.status_code)
+        response_data = response.json()
+        print("Moralis response:", response_data)
+        print("Status code:", response.status_code)
         
-        if x.status_code == 201:
-            # user can authenticate
+        if response.status_code == 201:
             eth_address = response_data.get('address')
-            print("eth address", eth_address)
-            walletid = eth_address
+            print("ETH address:", eth_address)
             try:
-                user = CustomUser.objects.get(username=walletid)
+                user = CustomUser.objects.get(username__iexact=eth_address)
+                print("User found:", user.username)
                 if user.is_active:
                     login(request, user)
                     request.session['auth_info'] = data
                     request.session['verified_data'] = response_data
 
-                    # Redirect based on user type
-                    if user.user_type == 'NGO/GOVT':
-                        redirect_url = '/govgenqr/'
-                    elif user.user_type == 'HANDLER':
-                        redirect_url = '/handlerscanqr/'
-                    elif user.user_type == 'RECIPIENT':
-                        redirect_url = '/recipscanqr/'
-                    else:
-                        redirect_url = '/'
-                    
+                    redirect_url = determine_redirect_url(user)
                     return JsonResponse({'user': user.username, 'redirect_url': redirect_url})
                 else:
-                    return JsonResponse({'error': 'account disabled'})
+                    print("Account is disabled.")
+                    return JsonResponse({'error': 'Account disabled'})
             except CustomUser.DoesNotExist:
-                # User does not exist, redirect to signup
+                print("User does not exist, redirecting to signup.")
                 return JsonResponse({'redirect_url': '/signup/'})
         else:
+            print("Failed to verify message.")
             return JsonResponse(response_data)
     except Exception as e:
-        # Handle any unexpected errors
-        print("Error:", e)
+        print("Error:", str(e))
         return JsonResponse({'error': 'An unexpected error occurred'})
+
+def determine_redirect_url(user):
+    if user.userType == 'NGO/GOVT':
+        return '/govgenqr/'
+    elif user.userType == 'HANDLER':
+        return '/handlerscanqr/'
+    elif user.userType == 'RECIPIENT':
+        return '/recipscanqr/'
+    else:
+        return '/'
