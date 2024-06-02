@@ -112,6 +112,7 @@ def verify_message(request):
         print("eth address", eth_address)
         try:
             user = User.objects.get(username=eth_address)
+            
         except User.DoesNotExist:
             user = User(username=eth_address)
             user.is_staff = False
@@ -119,6 +120,7 @@ def verify_message(request):
             user.save()
         if user is not None:
             if user.is_active:
+                print(user)
                 login(request, user)
                 request.session['auth_info'] = data
                 request.session['verified_data'] = json.loads(x.text)
