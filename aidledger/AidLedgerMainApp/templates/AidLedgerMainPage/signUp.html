@@ -10,22 +10,22 @@
 </head>
 <body>
     <h1>Sign Up with MetaMask</h1>
-    <form id="signup-form" method="POST" action="{% url 'signup' %}">
+    <form id="signup-form" method="post" action="{% url 'signup' %}">
         {% csrf_token %}
-        <input type="hidden" id="ethAddress" name="ethAddress" value="{{ eth_address }}">
-        
-        <label for="userType">Select User Type:</label>
-        <select id="userType" name="userType">
-            <option value="NGO/GOVT">NGO/GOVT</option>
-            <option value="HANDLER">HANDLER</option>
-            <option value="RECIPIENT">RECIPIENT</option>
-        </select>
-        <br>
-
-        <label for="accountName">Username:</label>
-        <input type="text" id="accountName" name="accountName" required>
-        <br>
-
+        <!-- Include other form fields here -->
+        <input type="hidden" name="eth_address" value="{{ ethAddress }}">
+        <div>
+            <label for="userType">User Type:</label>
+            <select name="userType" id="userType">
+                <option value="NGO/GOVT">NGO/GOVT</option>
+                <option value="HANDLER">HANDLER</option>
+                <option value="RECIPIENT">RECIPIENT</option>
+            </select>
+        </div>
+        <div>
+            <label for="accountName">Account Name:</label>
+            <input type="text" name="accountName" id="accountName" required>
+        </div>
         <button type="submit">Sign Up</button>
     </form>
 </body>

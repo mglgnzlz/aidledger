@@ -6,9 +6,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Retrieve form data
         const formData = new FormData(signupForm);
-        const ethAddress = formData.get("ethAddress");
+        const ethAddress = formData.get("eth_address");
+        console.log("Ethereum Address:", ethAddress);  // Log eth_address value
 
-        // Perform client-side form validation if necessary
+        // Check if ethAddress is correctly populated
+        if (!ethAddress) {
+            console.error("Ethereum address is missing.");
+            return;
+        }
 
         // Send form data to the server using AJAX
         const xhr = new XMLHttpRequest();
@@ -18,17 +23,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Convert form data to JSON format
         const jsonData = JSON.stringify({
-            ethAddress: ethAddress,
-            userType: formData.get("userType")  // Include account type in the JSON data
-            // Add other form fields as needed
+            username: ethAddress, // Use ethAddress as username
+            userType: formData.get("userType"),
+            accountName: formData.get("accountName"), // Include account type in the JSON data
         });
 
         // Handle AJAX response
         xhr.onload = function() {
             if (xhr.status === 200) {
                 const response = JSON.parse(xhr.responseText);
-                const dashboardUrl = response.dashboard_url;
-                window.location.href = dashboardUrl; // Redirect to the dashboard URL
+                console.log("Redirecting to:", response.redirect_url);
+                window.location.href = response.redirect_url; // Redirect to the response URL (dashboard)
             } else {
                 // Handle errors or display error messages to the user
                 console.error("Error:", xhr.statusText);
@@ -37,6 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Send JSON data
         xhr.send(jsonData);
+        console.log("JSON Data Sent:", jsonData);
     });
 
     // Function to retrieve CSRF token from cookies

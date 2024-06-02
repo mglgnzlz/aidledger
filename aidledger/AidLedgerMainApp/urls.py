@@ -5,7 +5,7 @@ urlpatterns = [
     path('govgenqr/', views.govGenerateQR, name='govGenerateQR'),
     path('handlerscanqr/', views.handlerScanQR, name='handlerScanQR'),
     path('recipscanqr/', views.recipScanQR, name='recipScanQR'),
-    path('signup/', views.signup, name='signup'),
+    path('signup/', views.SignUpView.as_view(), name='signup'),
     
     
     path('moralis_auth', views.moralis_auth, name='moralis_auth'),

@@ -9,41 +9,54 @@ from django.contrib.auth.models import User
 from datetime import datetime, timedelta, timezone
 from .models import CustomUser
 from .forms import CustomUserCreationForm
+from django.views import View
 
 
 # GENERATE QR / SCAN QR FUNCTIONS
 
-def signup(request):
-    eth_address = request.GET.get('ethAddress', '')  # Retrieve MetaMask address from query parameters
+class SignUpView(View):
+    def get(self, request):
+        eth_address = request.GET.get('ethAddress', '')
+        return render(request, 'AidLedgerMainPage/signUp.html', {'ethAddress': eth_address})
 
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.ethAddress = request.POST.get('ethAddress')  # Assign MetaMask address from form data
-            user.save()
+    def post(self, request):
+        try:
+            # Parse JSON data from the request body
+            data = json.loads(request.body)
+            username = data.get('username')
+            userType = data.get('userType')
+            accountName = data.get('accountName')
 
-            # Determine account type
-            account_type = request.POST.get('userType')
+            if not username:
+                return JsonResponse({'error': 'Ethereum address is missing'}, status=400)
+            if not userType:
+                return JsonResponse({'error': 'User type is missing'}, status=400)
+            if not accountName:
+                return JsonResponse({'error': 'Account name is missing'}, status=400)
 
-            # Determine dashboard URL based on account type
-            if account_type == 'NGO/GOVT':
-                dashboard_url = '/govgenqr/'  # Replace with the URL for NGO/GOVT dashboard
-            elif account_type == 'HANDLER':
-                dashboard_url = '/handlerscanqr/'  # Replace with the URL for HANDLER dashboard
-            elif account_type == 'RECIPIENT':
-                dashboard_url = '/recipscanqr/'  # Replace with the URL for RECIPIENT dashboard
-            
-            return JsonResponse({'dashboard_url': dashboard_url})
-    else:
-        form = CustomUserCreationForm()
+            # Create and save a new UserProfile instance
+            CustomUser.objects.create(
+                username=username,
+                userType=userType,
+                accountName=accountName
+            )
 
-    context = {
-        'form': form,
-        'ethAddress': eth_address,
-    }
-    return render(request, "AidLedgerMainPage/signUp.html", context)
+            # Determine the redirect URL based on user type
+            redirect_url = ''
+            if username == 'NGO/GOVT':
+                redirect_url = '/govgenqr/'
+            elif userType == 'HANDLER':
+                redirect_url = '/handlerscanqr/'
+            elif accountName == 'RECIPIENT':
+                redirect_url = '/recipscanqr/'
 
+            # Return a JSON response indicating success and the redirect URL
+            return JsonResponse({'message': 'Sign up successful!', 'redirect_url': redirect_url}, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            print(f"Error: {e}")
+            return JsonResponse({'error': str(e)}, status=400)
 
 
     
@@ -122,35 +135,51 @@ def request_message(request):
 
 
 def verify_message(request):
-    data = json.loads(request.body)
-    print(data)
+    try:
+        data = json.loads(request.body)
+        print(data)
 
-    REQUEST_URL = 'https://authapi.moralis.io/challenge/verify/evm'
-    x = requests.post(
-        REQUEST_URL,
-        json=data,
-        headers={'X-API-KEY': API_KEY})
-    print(json.loads(x.text))
-    print(x.status_code)
-    if x.status_code == 201:
-        # user can authenticate
-        eth_address=json.loads(x.text).get('address')
-        print("eth address", eth_address)
-        try:
-            user = CustomUser.objects.get(username=eth_address)
-        except CustomUser.DoesNotExist:
-            # user = CustomUser(username=eth_address)
-            # user.is_staff = False
-            # user.is_superuser = False
-            # user.save()
-            return redirect('signup')
-        if user is not None:
-            if user.is_active:
-                login(request, user)
-                request.session['auth_info'] = data
-                request.session['verified_data'] = json.loads(x.text)
-                return JsonResponse({'user': user.username})
-            else:
-                return JsonResponse({'error': 'account disabled'})
-    else:
-        return JsonResponse(json.loads(x.text))
+        REQUEST_URL = 'https://authapi.moralis.io/challenge/verify/evm'
+        x = requests.post(
+            REQUEST_URL,
+            json=data,
+            headers={'X-API-KEY': API_KEY})
+        
+        response_data = json.loads(x.text)
+        print(response_data)
+        print(x.status_code)
+        
+        if x.status_code == 201:
+            # user can authenticate
+            eth_address = response_data.get('address')
+            print("eth address", eth_address)
+            walletid = eth_address
+            try:
+                user = CustomUser.objects.get(username=walletid)
+                if user.is_active:
+                    login(request, user)
+                    request.session['auth_info'] = data
+                    request.session['verified_data'] = response_data
+
+                    # Redirect based on user type
+                    if user.user_type == 'NGO/GOVT':
+                        redirect_url = '/govgenqr/'
+                    elif user.user_type == 'HANDLER':
+                        redirect_url = '/handlerscanqr/'
+                    elif user.user_type == 'RECIPIENT':
+                        redirect_url = '/recipscanqr/'
+                    else:
+                        redirect_url = '/'
+                    
+                    return JsonResponse({'user': user.username, 'redirect_url': redirect_url})
+                else:
+                    return JsonResponse({'error': 'account disabled'})
+            except CustomUser.DoesNotExist:
+                # User does not exist, redirect to signup
+                return JsonResponse({'redirect_url': '/signup/'})
+        else:
+            return JsonResponse(response_data)
+    except Exception as e:
+        # Handle any unexpected errors
+        print("Error:", e)
+        return JsonResponse({'error': 'An unexpected error occurred'})
