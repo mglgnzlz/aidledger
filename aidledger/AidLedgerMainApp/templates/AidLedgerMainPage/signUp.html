@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="{% static 'js/signUp.js' %}"></script>
+    <title>Sign Up</title>
+</head>
+<body>
+    <h1>Sign Up with MetaMask</h1>
+    <form id="signup-form" method="post" action="{% url 'signup' %}">
+        {% csrf_token %}
+        <!-- Include other form fields here -->
+        <input type="hidden" name="eth_address" value="{{ ethAddress }}">
+        <div>
+            <label for="userType">User Type:</label>
+            <select name="userType" id="userType">
+                <option value="NGO/GOVT">NGO/GOVT</option>
+                <option value="HANDLER">HANDLER</option>
+                <option value="RECIPIENT">RECIPIENT</option>
+            </select>
+        </div>
+        <div>
+            <label for="accountName">Account Name:</label>
+            <input type="text" name="accountName" id="accountName" required>
+        </div>
+        <button type="submit">Sign Up</button>
+    </form>
+</body>
+</html>
