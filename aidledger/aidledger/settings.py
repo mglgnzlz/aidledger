@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'AidLedgerMainApp.apps.AidledgermainappConfig',
+    'AidLedgerMainApp',
     
 ]
 
@@ -101,7 +101,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+LOGOUT_REDIRECT_URL = '/moralis_auth' 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 

@@ -7,8 +7,47 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, timezone
+from .models import CustomUser
+from .forms import CustomUserCreationForm
+
 
 # GENERATE QR / SCAN QR FUNCTIONS
+
+def signup(request):
+    eth_address = request.GET.get('ethAddress', '')  # Retrieve MetaMask address from query parameters
+
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.ethAddress = request.POST.get('ethAddress')  # Assign MetaMask address from form data
+            user.save()
+
+            # Determine account type
+            account_type = request.POST.get('userType')
+
+            # Determine dashboard URL based on account type
+            if account_type == 'NGO/GOVT':
+                dashboard_url = '/govgenqr/'  # Replace with the URL for NGO/GOVT dashboard
+            elif account_type == 'HANDLER':
+                dashboard_url = '/handlerscanqr/'  # Replace with the URL for HANDLER dashboard
+            elif account_type == 'RECIPIENT':
+                dashboard_url = '/recipscanqr/'  # Replace with the URL for RECIPIENT dashboard
+            
+            return JsonResponse({'dashboard_url': dashboard_url})
+    else:
+        form = CustomUserCreationForm()
+
+    context = {
+        'form': form,
+        'ethAddress': eth_address,
+    }
+    return render(request, "AidLedgerMainPage/signUp.html", context)
+
+
+
+    
+    
 def govGenerateQR (request):
     
     
@@ -98,12 +137,13 @@ def verify_message(request):
         eth_address=json.loads(x.text).get('address')
         print("eth address", eth_address)
         try:
-            user = User.objects.get(username=eth_address)
-        except User.DoesNotExist:
-            user = User(username=eth_address)
-            user.is_staff = False
-            user.is_superuser = False
-            user.save()
+            user = CustomUser.objects.get(username=eth_address)
+        except CustomUser.DoesNotExist:
+            # user = CustomUser(username=eth_address)
+            # user.is_staff = False
+            # user.is_superuser = False
+            # user.save()
+            return redirect('signup')
         if user is not None:
             if user.is_active:
                 login(request, user)

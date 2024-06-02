@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-
-{%load static%}
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -11,20 +10,23 @@
 </head>
 <body>
     <h1>Sign Up with MetaMask</h1>
-    <form id="signup-form">
-        <input type="hidden" id="ethAddress" name="ethAddress" value="{{ethAddress}}">
-        <label for="userType"> Select User Type: </label>
+    <form id="signup-form" method="POST" action="{% url 'signup' %}">
+        {% csrf_token %}
+        <input type="hidden" id="ethAddress" name="ethAddress" value="{{ eth_address }}">
+        
+        <label for="userType">Select User Type:</label>
         <select id="userType" name="userType">
             <option value="NGO/GOVT">NGO/GOVT</option>
             <option value="HANDLER">HANDLER</option>
             <option value="RECIPIENT">RECIPIENT</option>
         </select>
         <br>
-        <label for="acctName"> Username: </label>
-        <input type="text" id="acctName" name="acctName">
+
+        <label for="accountName">Username:</label>
+        <input type="text" id="accountName" name="accountName" required>
         <br>
+
         <button type="submit">Sign Up</button>
     </form>
-
 </body>
 </html>
