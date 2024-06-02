@@ -80,7 +80,8 @@
       const { message } = await requestMessage(account, chain);
       const signature = await signer.signMessage(message);
       const { user } = await verifyMessage(message, signature);
-      console.log(user)
+      console.log("user is", user)
+
       if (user) {
         location.reload();
       }

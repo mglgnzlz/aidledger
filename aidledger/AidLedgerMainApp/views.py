@@ -1,3 +1,4 @@
+from urllib import response
 from django.shortcuts import render
 import json
 import requests
@@ -7,8 +8,31 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta, timezone
-
+from .forms import CustomUserCreationForm
+from .models import CustomUser
 # GENERATE QR / SCAN QR FUNCTIONS
+
+
+def signup(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.ethAddress = request.POST.get('ethAddress')
+            user.save()
+            login(request, user)
+            return redirect('moralis_auth')
+    else:
+        form = CustomUserCreationForm()
+        eth_address = request.session.get('eth_address', '')
+
+    context = {
+        'form': form,
+        'ethAddress': eth_address,
+    }
+    return render(request, "AidLedgerMainPage/signUp.html", context)
+
+
 def govGenerateQR (request):
     
     
@@ -98,19 +122,21 @@ def verify_message(request):
         eth_address=json.loads(x.text).get('address')
         print("eth address", eth_address)
         try:
-            user = User.objects.get(username=eth_address)
-        except User.DoesNotExist:
-            user = User(username=eth_address)
-            user.is_staff = False
-            user.is_superuser = False
-            user.save()
+            user = CustomUser.objects.get(ethAddress=eth_address)
+        except CustomUser.DoesNotExist:
+            # user = CustomUser(ethAddress=eth_address)
+            # user.is_staff = False
+            # user.is_superuser = False
+            # user.save()
+            return redirect('signup/')
+        
         if user is not None:
             if user.is_active:
-                login(request, user)
+                login(request, CustomUser)
                 request.session['auth_info'] = data
                 request.session['verified_data'] = json.loads(x.text)
-                return JsonResponse({'user': user.username})
-            else:
-                return JsonResponse({'error': 'account disabled'})
+                return JsonResponse({'user': user.ethAddress})
+        else:
+            return JsonResponse({'error': 'account disabled'})
     else:
         return JsonResponse(json.loads(x.text))

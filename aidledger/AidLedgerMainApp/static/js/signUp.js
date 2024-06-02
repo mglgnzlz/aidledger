@@ -1,38 +1,23 @@
-
-
-document.getElementById('signup_form').addEventListener('submit', async(event) => {
-    event.preventDefault();
-    const ethAddress=document.getElementById('ethAddress').value;
-    const userType=document.getElementById('userType').value;
-    const acctName=document.getElementById('acctName').value;
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('signup-form');
     
-    const response = await fetch("{% url 'signup %}", {
-        method: 'POST',
-        headers: {
-            'Content-Type':'application/json',
-            'X-CSRFToken': '{{csrf_token}}'
-        },
-        body: JSON.stringify({
-            ethAddress,
-            userType,
-            acctName,
-        })
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        // Example MetaMask connection code
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                const ethAddress = accounts[0];
+                document.getElementById('ethAddress').value = ethAddress;
+                
+                form.submit();
+            } catch (error) {
+                console.error('MetaMask connection error:', error);
+                alert('Failed to connect to MetaMask');
+            }
+        } else {
+            alert('MetaMask is not installed. Please install it to continue.');
+        }
     });
-    
-    const data = await response.json();
-    if(data.user) {
-        if(data.userType == 'NGO/GOVT'){
-            window.location.href = "{% url 'govGenerateQR'%}"
-        }
-        else if(data.userType == 'HANDLER'){
-            window.location.href = "{% url 'handlerScanQR'%}"
-        }
-        else if(data.userType == 'RECIPIENT'){
-            window.location.href = "{% url 'recipScanQR' %}"
-        }
-    } else {
-        alert("Sign up error")
-    }
-
-
 });
