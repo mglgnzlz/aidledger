@@ -22,6 +22,9 @@
 
 <div class="qrcodeSection">
   <h3 class="qrGen">QR CODE GENERATED</h3>
+  {% if qr_code %}
+    <img src="{{ qr_code }}" alt="QR Code">
+  {% endif %}
   <button>DOWNLOAD</button>
 </div>
 

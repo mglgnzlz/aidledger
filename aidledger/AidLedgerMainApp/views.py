@@ -11,10 +11,14 @@ from .models import CustomUser
 from .forms import CustomUserCreationForm
 from django.views import View
 from web3 import Web3
+from io import BytesIO
+from base64 import b64encode
+import qrcode
 
 # Connect to Ganache
 ganache_url = "http://127.0.0.1:7545"
 web3 = Web3(Web3.HTTPProvider(ganache_url))
+
 
 # Check if connected
 if not web3.is_connected():
@@ -22,15 +26,11 @@ if not web3.is_connected():
 else:
     print(f"Connected to Ethereum network: {web3}")
 
-# Load account
-web3.eth.defaultAccount = web3.eth.accounts[0]
-currentAccountAddress = web3.eth.defaultAccount
-
 # Load contract ABI
 with open('../blockchain/build/contracts/AidLedger.json') as f:
     aid_ledger_json = json.load(f)
     contract_abi = aid_ledger_json['abi']
-    contract_address = "0x668B78a29c4468800d35af772731c53621Ad5376"
+    contract_address = "0xbcC61bF5d4Ff502BaBBA11e9d060156516672AE8"
     print(f"Contract ABI: {contract_abi}")
 
 contract = web3.eth.contract(address=contract_address, abi=contract_abi)
@@ -42,6 +42,8 @@ try:
     print(relief_good)
 except Exception as e:
     print(f"Error: {e}")
+
+
 
 # GENERATE QR / SCAN QR FUNCTIONS
 
@@ -118,8 +120,10 @@ def create_relief_good(request):
         context = {}
         rfg_type = request.POST.get('rfgType')
         rfg_weight = request.POST.get('rfgWeight')
+        username = request.session['username']
         
-        donor_address = currentAccountAddress
+        donor_address = Web3.to_checksum_address(username)
+        
         recipient_address = "0x0000000000000000000000000000000000000000"
 
         # print(f"User: {user}")
@@ -142,8 +146,29 @@ def create_relief_good(request):
             # Optionally, you can add code to handle the transaction receipt
             print(f"Transaction receipt: {receipt}")
             
-            # Redirect back to the dashboard or show a success message
-            return redirect('govGenerateQR')
+                        # Generate QR code based on the transaction receipt
+            qr_data = f"Transaction Receipt: {receipt.transactionHash.hex()}"
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=5,
+                border=3,
+            )
+            qr.add_data(qr_data)
+            qr.make(fit=True)
+
+            img = qr.make_image(fill='black', back_color='white')
+            buffer = BytesIO()
+            img.save(buffer)
+            buffer.seek(0)
+
+            # Encode the image in base64 and prepare it for embedding in HTML
+            encoded_img = b64encode(buffer.read()).decode('utf-8')
+            context['qr_code'] = f'data:image/png;base64,{encoded_img}'
+
+            # Pass the QR code data to the template
+            return render(request, 'AidLedgerMainPage/govtDashboard.html', context)
+
         except Exception as e:
             print(f"Error: {e}")
             return JsonResponse({'error': str(e)}, status=400)
@@ -240,6 +265,7 @@ def verify_message(request):
                     login(request, user)
                     request.session['auth_info'] = data
                     request.session['verified_data'] = response_data
+                    request.session['username'] = user.username
 
                     redirect_url = determine_redirect_url(user)
                     return JsonResponse({'user': user.username, 'redirect_url': redirect_url})
