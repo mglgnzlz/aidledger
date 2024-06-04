@@ -31,7 +31,8 @@
       <tr>
         <th>ID</th>
         <th>Donor</th>
-        <th>Description</th>
+        <th>Type of Good</th>
+        <th>Weight</th>
         <th>Status</th>
         <th>Recipient</th>
       </tr>
@@ -40,7 +41,8 @@
       <tr>
         <td>0</td>
         <td>0xa572954b35bEe056584D9deF67bFC2970ae4C99c</td>
-        <td>Canned</td>
+        <td>Canned food</td>
+        <td>0.4 kg</td>
         <td>In transit</td>
         <td>0xa0562659c97C29e5784D7bEe035d4C99bFaeF54b</td>
       </tr>
@@ -48,7 +50,8 @@
       <tr>
         <td>{{ good.id }}</td>
         <td>{{ good.donor }}</td>
-        <td>{{ good.description }}</td>
+        <td>{{ good.typeOfGood }}</td>
+        <td>{{ good.weight }}</td>
         <td>{{ good.status }}</td>
         <td>{{ good.recipient }}</td>
       </tr>

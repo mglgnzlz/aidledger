@@ -26,7 +26,7 @@ else:
 with open('../blockchain/build/contracts/AidLedger.json') as f:
     aid_ledger_json = json.load(f)
     contract_abi = aid_ledger_json['abi']
-    contract_address = "0x5E24AD50928BBD960a44DD7AA9b4E10C836a3762"
+    contract_address = "0x7F3db06AA15B310aA951903d88Ae7a222a0628D1"
     print(f"Contract ABI: {contract_abi}")
 
 contract = web3.eth.contract(address=contract_address, abi=contract_abi)
@@ -97,14 +97,16 @@ def govGenerateQR (request):
             'id': relief_good[0],
             # 'donor': web3.toChecksumAddress(relief_good[1]),  # Ensure the address is checksummed
             'donor': relief_good[1],
-            'description': relief_good[2],
-            'status': relief_good[3],
-            'recipient': relief_good[4]
+            'typeOfGood': relief_good[2],
+            'weight': relief_good[3],
+            'status': relief_good[4],
+            'recipient': relief_good[5]
         })
     print(f"Relief good count: {relief_good_count}")
     print(f"Relief goods: {relief_goods}")
     # return render(request, "AidLedgerMainPage/govtDashboard.html", context)
-    return render(request, 'AidLedgerMainPage/govtDashboard.html', context, {'relief_goods': relief_goods})
+    # return render(request, 'AidLedgerMainPage/govtDashboard.html', context, {'relief_goods': relief_goods})
+    return render(request, 'AidLedgerMainPage/govtDashboard.html', {'relief_goods': relief_goods})
 
 def handlerScanQR (request):
     

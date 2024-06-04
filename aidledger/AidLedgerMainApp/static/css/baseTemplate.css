@@ -68,10 +68,15 @@ body {
   padding: 16px 0px;
 }
 
+table {
+  border-collapse: collapse;
+}
+
 th,
 td {
+  padding: 4px;
   border: 1px solid black;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 th {
