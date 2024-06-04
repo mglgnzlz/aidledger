@@ -10,7 +10,26 @@ from datetime import datetime, timedelta, timezone
 from .models import CustomUser
 from .forms import CustomUserCreationForm
 from django.views import View
+from web3 import Web3
 
+# Connect to Ganache
+ganache_url = "http://127.0.0.1:7545"
+web3 = Web3(Web3.HTTPProvider(ganache_url))
+
+# Check if connected
+if not web3.is_connected():
+    raise Exception("Could not connect to Ethereum network")
+else:
+    print(f"Connected to Ethereum network: {web3}")
+
+# Load contract ABI
+with open('../blockchain/build/contracts/AidLedger.json') as f:
+    aid_ledger_json = json.load(f)
+    contract_abi = aid_ledger_json['abi']
+    contract_address = "0x8303adCA671B1e33130915a78C7E863640Ae4691"
+
+contract = web3.eth.contract(address=contract_address, abi=contract_abi)
+print(f"Contract: {contract}")
 
 # GENERATE QR / SCAN QR FUNCTIONS
 
