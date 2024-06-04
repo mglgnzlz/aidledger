@@ -28,3 +28,6 @@ class CustomUser(AbstractUser):
         help_text=('Specific permissions for this user.'),
         verbose_name=('user permissions'),
     )
+    
+class QRCode(models.Model):
+    qr_image = models.ImageField(upload_to='qr_codes')
