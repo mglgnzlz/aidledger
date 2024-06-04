@@ -10,7 +10,8 @@
 <h1>GENERATE QR CODE</h1>
 
 <div class="inputFields">
-  <form action="">
+  <form action="{% url 'create_relief_good' %}" method="post">
+    {% csrf_token %}
     <label for="rfgType">TYPE OF GOODS TO BE DONATED:</label>
     <input type="text" id="rfgType" name="rfgType" /><br /><br />
     <label for="rfgWeight">WEIGHT:</label>
@@ -38,14 +39,6 @@
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td>0</td>
-        <td>0xa572954b35bEe056584D9deF67bFC2970ae4C99c</td>
-        <td>Canned food</td>
-        <td>0.4 kg</td>
-        <td>In transit</td>
-        <td>0xa0562659c97C29e5784D7bEe035d4C99bFaeF54b</td>
-      </tr>
       {% for good in relief_goods %}
       <tr>
         <td>{{ good.id }}</td>

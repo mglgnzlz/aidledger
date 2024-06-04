@@ -22,6 +22,10 @@ if not web3.is_connected():
 else:
     print(f"Connected to Ethereum network: {web3}")
 
+# Load account
+web3.eth.defaultAccount = web3.eth.accounts[0]
+currentAccountAddress = web3.eth.defaultAccount
+
 # Load contract ABI
 with open('../blockchain/build/contracts/AidLedger.json') as f:
     aid_ledger_json = json.load(f)
@@ -104,9 +108,47 @@ def govGenerateQR (request):
         })
     print(f"Relief good count: {relief_good_count}")
     print(f"Relief goods: {relief_goods}")
+    relief_goods.reverse()
     # return render(request, "AidLedgerMainPage/govtDashboard.html", context)
-    # return render(request, 'AidLedgerMainPage/govtDashboard.html', context, {'relief_goods': relief_goods})
     return render(request, 'AidLedgerMainPage/govtDashboard.html', {'relief_goods': relief_goods})
+
+# View to create a new relief good
+def create_relief_good(request):
+    if request.method == "POST":
+        context = {}
+        rfg_type = request.POST.get('rfgType')
+        rfg_weight = request.POST.get('rfgWeight')
+        
+        donor_address = currentAccountAddress
+        recipient_address = "0x0000000000000000000000000000000000000000"
+
+        # print(f"User: {user}")
+        print(f"Donor Address: {donor_address}")
+        print(f"Recipient Address: {recipient_address}")
+        
+        # Interact with the smart contract to create a new relief good
+        try:
+            tx_hash = contract.functions.createReliefGood(
+                donor_address,
+                rfg_type,
+                rfg_weight,
+                "In transit",
+                recipient_address
+            ).transact({'from': donor_address})
+            
+            # Wait for the transaction to be mined
+            receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
+            
+            # Optionally, you can add code to handle the transaction receipt
+            print(f"Transaction receipt: {receipt}")
+            
+            # Redirect back to the dashboard or show a success message
+            return redirect('govGenerateQR')
+        except Exception as e:
+            print(f"Error: {e}")
+            return JsonResponse({'error': str(e)}, status=400)
+
+    return render(request, 'AidLedgerMainPage/govtDashboard.html', context)
 
 def handlerScanQR (request):
     
