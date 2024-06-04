@@ -30,7 +30,7 @@ currentAccountAddress = web3.eth.defaultAccount
 with open('../blockchain/build/contracts/AidLedger.json') as f:
     aid_ledger_json = json.load(f)
     contract_abi = aid_ledger_json['abi']
-    contract_address = "0x7F3db06AA15B310aA951903d88Ae7a222a0628D1"
+    contract_address = "0x668B78a29c4468800d35af772731c53621Ad5376"
     print(f"Contract ABI: {contract_abi}")
 
 contract = web3.eth.contract(address=contract_address, abi=contract_abi)
