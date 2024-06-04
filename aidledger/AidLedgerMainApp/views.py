@@ -26,10 +26,18 @@ else:
 with open('../blockchain/build/contracts/AidLedger.json') as f:
     aid_ledger_json = json.load(f)
     contract_abi = aid_ledger_json['abi']
-    contract_address = "0x8303adCA671B1e33130915a78C7E863640Ae4691"
+    contract_address = "0x5E24AD50928BBD960a44DD7AA9b4E10C836a3762"
+    print(f"Contract ABI: {contract_abi}")
 
 contract = web3.eth.contract(address=contract_address, abi=contract_abi)
 print(f"Contract: {contract}")
+
+# Test the function call
+try:
+    relief_good = contract.functions.getReliefGood(1).call()
+    print(relief_good)
+except Exception as e:
+    print(f"Error: {e}")
 
 # GENERATE QR / SCAN QR FUNCTIONS
 
@@ -77,17 +85,26 @@ class SignUpView(View):
             print(f"Error: {e}")
             return JsonResponse({'error': str(e)}, status=400)
 
-
-    
-    
 def govGenerateQR (request):
-    
-    
-    context = {
-        
-    }
-    
-    return render(request, "AidLedgerMainPage/govtDashboard.html", context)
+    context = {}
+
+    print("govGenerateQR")    
+    relief_good_count = contract.functions.reliefGoodCount().call()
+    relief_goods = []
+    for i in range(1, relief_good_count + 1):
+        relief_good = contract.functions.getReliefGood(i).call()
+        relief_goods.append({
+            'id': relief_good[0],
+            # 'donor': web3.toChecksumAddress(relief_good[1]),  # Ensure the address is checksummed
+            'donor': relief_good[1],
+            'description': relief_good[2],
+            'status': relief_good[3],
+            'recipient': relief_good[4]
+        })
+    print(f"Relief good count: {relief_good_count}")
+    print(f"Relief goods: {relief_goods}")
+    # return render(request, "AidLedgerMainPage/govtDashboard.html", context)
+    return render(request, 'AidLedgerMainPage/govtDashboard.html', context, {'relief_goods': relief_goods})
 
 def handlerScanQR (request):
     

@@ -1,45 +1,43 @@
 pragma solidity ^0.5.0;
 
 contract AidLedger {
-  uint public reliefGoodCount = 0;
-  mapping(uint => ReliefGood) public reliefGoods;
+  uint256 public reliefGoodCount = 0;
+  mapping(uint256 => ReliefGood) public reliefGoods;
 
   event ReliefGoodCreated(
-    uint id,
-    string donor,
+    uint256 id,
+    address donor,
     string description,
     string status,
     string recipient
   );
 
   struct ReliefGood {
-    uint id;
-    string donor;
+    uint256 id;
+    address donor;
     string description;
     string status;
     string recipient;
   }
 
   constructor() public {
-    createReliefGood("Migs", "Hotdog", "In transit", "Clarence");
-    createReliefGood("Kyle", "Egg", "In transit", "Ced");
-    createReliefGood("Ced", "Hotdog", "Delivered", "Migs");
+    createReliefGood(0x0000000000000000000000000000000000000001, "Hotdog", "In transit", "Clarence");
+    createReliefGood(0x0000000000000000000000000000000000000002, "Egg", "In transit", "Ced");
+    createReliefGood(0x0000000000000000000000000000000000000003, "Hotdog", "Delivered", "Migs");
   }
 
-  // Create a new relief good
-  function createReliefGood(string memory _donor, string memory _description, string memory _status, string memory _recipient) public {
+  function createReliefGood(address _donor, string memory _description, string memory _status, string memory _recipient) public {
     reliefGoodCount++;
     reliefGoods[reliefGoodCount] = ReliefGood(reliefGoodCount, _donor, _description, _status, _recipient);
     emit ReliefGoodCreated(reliefGoodCount, _donor, _description, _status, _recipient);
   }
 
-  // Update relief good status
-  function updateReliefGoodstatus(uint _id, string memory _status) public {
+  function updateReliefGoodStatus(uint256 _id, string memory _status) public {
     reliefGoods[_id].status = _status;
   }
 
-  // Get relief good details
-  function getReliefGood(uint _id) public view returns (uint, string memory, string memory, string memory) {
-    return (reliefGoods[_id].id, reliefGoods[_id].donor, reliefGoods[_id].description, reliefGoods[_id].status);
+  function getReliefGood(uint256 _id) public view returns (uint256, address, string memory, string memory, string memory) {
+    ReliefGood memory reliefGood = reliefGoods[_id];
+    return (reliefGood.id, reliefGood.donor, reliefGood.description, reliefGood.status, reliefGood.recipient);
   }
 }
