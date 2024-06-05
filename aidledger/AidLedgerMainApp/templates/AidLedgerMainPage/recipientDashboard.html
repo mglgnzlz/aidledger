@@ -1,40 +1,58 @@
-{% extends 'AidLedgerMainPage/baseTemplate.html' %}
-
-{% block sidebar %}
-<h2>Donator Dashboard</h2>
+{% extends 'AidLedgerMainPage/baseTemplate.html' %} {% block sidebar %}
+<h2>Recipient Dashboard</h2>
 <h3>SCAN QR</h3>
 <a href="" class="button"><i class="fa-solid fa-database"></i> Scan QR</a>
-<h3>DONATION TRACKER </h3>
-<a href="" class="button"><i class="fa-solid fa-file"></i> Donation Tracker</a>
-<h2>Donator Dashboard</h2>
-<h3>SCAN QR</h3>
-<a href="" class="button"><i class="fa-solid fa-database"></i> Scan QR</a>
-<h3>DONATION TRACKER </h3>
+<h3>DONATION TRACKER</h3>
 <a href="" class="button"><i class="fa-solid fa-file"></i> Donation Tracker</a>
 
-    {% endblock %}
+{% endblock %} {% block content %}
 
+<div class="inputFields">
+  <h1>SCAN QR CODE</h1>
+  <form
+    action="{% url 'recipScanQR' %}"
+    method="post"
+    enctype="multipart/form-data"
+  >
+    {% csrf_token %}
+    <input type="file" name="qr_image" accept="image/*" />
+    <input type="submit" value="Upload" />
+  </form>
+</div>
+{% if qr_code_data %}
+<div class="decoded-data">
+  <p>Decoded QR Data: {{ qr_code_data }}</p>
+  <p>Relief Good ID: {{ relief_good_id }}</p>
+  <p>{{ status }}</p>
+</div>
+{% endif %}
 
+<div class="rfgList">
+  <h1>Relief Goods</h1>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Donor</th>
+        <th>Type of Good</th>
+        <th>Weight</th>
+        <th>Status</th>
+        <th>Recipient</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for good in relief_goods %}
+      <tr>
+        <td>{{ good.id }}</td>
+        <td>{{ good.donor }}</td>
+        <td>{{ good.typeOfGood }}</td>
+        <td>{{ good.weight }}</td>
+        <td>{{ good.status }}</td>
+        <td>{{ good.recipient }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 
-    {% block content %}
-
-    <h1>SCAN QR CODE</h1>
-    <div class="qrcodeSection">
-        <h3 class="qrGen">QR CODE</h3>
-        <button>SCAN QR</button>
-    </div>
-
-    <div class="inputFields">
-        <form action="">
-            <label for="rfgType">TYPE OF GOODS TO BE DONATED:</label>
-            <input type="text" id="rfgType" name="rfgType"><br><br>
-            <label for="rfgWeight">WEIGHT:</label>
-            <input type="text" id="rfgWeight" name="rfgWeight"><br><br>
-            <input type="submit" value="RECEIVED>
-        </form>
-    </div>
-
-    
-
-
-    {% endblock %}
+{% endblock %}
