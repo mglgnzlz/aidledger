@@ -22,5 +22,37 @@
 {% if qr_code_data %}
 <div class="decoded-data">
   <p>Decoded QR Data: {{ qr_code_data }}</p>
+  <p>Relief Good ID: {{ relief_good_id }}</p>
+  <p>{{ status }}</p>
 </div>
-{% endif %} {% endblock %}
+{% endif %}
+
+<div class="rfgList">
+  <h1>Relief Goods</h1>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Donor</th>
+        <th>Type of Good</th>
+        <th>Weight</th>
+        <th>Status</th>
+        <th>Recipient</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for good in relief_goods %}
+      <tr>
+        <td>{{ good.id }}</td>
+        <td>{{ good.donor }}</td>
+        <td>{{ good.typeOfGood }}</td>
+        <td>{{ good.weight }}</td>
+        <td>{{ good.status }}</td>
+        <td>{{ good.recipient }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

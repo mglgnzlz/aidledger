@@ -23,9 +23,6 @@ contract AidLedger {
   }
 
   constructor() public {
-    // createReliefGood(0x0000000000000000000000000000000000000001, "Canned food", "0.5 kg", "In transit", 0x000000000000000000000000000000000000000A);
-    // createReliefGood(0x0000000000000000000000000000000000000002, "Clothes", "1 kg", "In transit", 0x000000000000000000000000000000000000000b);
-    // createReliefGood(0x0000000000000000000000000000000000000003, "Noodles", "0.87 kg", "Delivered", 0x000000000000000000000000000000000000000C);
   }
 
   function createReliefGood(address _donor, string memory _typeOfGood, string memory _weight, string memory _status, address _recipient) public {
@@ -36,6 +33,11 @@ contract AidLedger {
 
   function updateReliefGoodStatus(uint256 _id, string memory _status) public {
     reliefGoods[_id].status = _status;
+  }
+
+  function updateReliefGoodDelivered(uint256 _id, address _recipient) public {
+    reliefGoods[_id].status = "Delivered";
+    reliefGoods[_id].recipient = _recipient;
   }
 
   function getReliefGood(uint256 _id) public view returns (uint256, address, string memory, string memory, string memory, address) {
