@@ -35,9 +35,9 @@ contract AidLedger {
     reliefGoods[_id].status = _status;
   }
 
-  function updateReliefGoodDelivered(uint256 _id, address _recipient) public {
-    reliefGoods[_id].status = "Delivered";
-    reliefGoods[_id].recipient = _recipient;
+  function updateReliefGoodDelivered(uint256 _id, string memory _status, address _newRecipient) public {
+    reliefGoods[_id].status = _status;
+    reliefGoods[_id].recipient = _newRecipient;
   }
 
   function getReliefGood(uint256 _id) public view returns (uint256, address, string memory, string memory, string memory, address) {

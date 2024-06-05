@@ -38,7 +38,7 @@ else:
 with open('../blockchain/build/contracts/AidLedger.json') as f:
     aid_ledger_json = json.load(f)
     contract_abi = aid_ledger_json['abi']
-    contract_address = "0x152C064854079fBb6CE05Efc8aa5278df1129777"
+    contract_address = "0xbd243C6E2D684Ea14A8eAE7821043b31cF000eE0"
     print(f"Contract ABI: {contract_abi}")
 
 contract = web3.eth.contract(address=contract_address, abi=contract_abi)
@@ -216,9 +216,7 @@ def handlerScanQR (request):
                     for log in logs:
                         decoded_log = contract.events.ReliefGoodCreated().process_log(log)
                         relief_good_id = decoded_log['args']['id']
-                        relief_good_status = decoded_log['args']['status']
                         print(f"Relief Good ID: {relief_good_id}")
-                        print(f"Relief Good status: {relief_good_status}")
                         context['relief_good_id'] = relief_good_id
                         break
                 except Exception as e:
@@ -226,26 +224,23 @@ def handlerScanQR (request):
                     context['error'] = 'Error decoding log'
 
                 # Update relief good status
-                if (relief_good_status != "Shipped"):
-                    relief_good_status = "Shipped"
-                    try:
-                        username = request.session['username']
-                        donor_address = Web3.to_checksum_address(username)
-                        tx_hash = contract.functions.updateReliefGoodStatus(
-                            relief_good_id,
-                            relief_good_status,
-                        ).transact({'from': donor_address})
-                            
-                        # Wait for the transaction to be mined
-                        receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
-                        print(f"Transaction receipt: {receipt}")
-                        context['status'] = f"Changed status to '{relief_good_status}'"
+                relief_good_status = "Shipped"
+                try:
+                    username = request.session['username']
+                    handler_address = Web3.to_checksum_address(username)
+                    tx_hash = contract.functions.updateReliefGoodStatus(
+                        relief_good_id,
+                        relief_good_status,
+                    ).transact({'from': handler_address})
+                        
+                    # Wait for the transaction to be mined
+                    receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
+                    print(f"Transaction receipt: {receipt}")
+                    context['status'] = f"Changed status to '{relief_good_status}'"
 
-                    except Exception as e:
-                        print(f"Error: {e}")
-                        return JsonResponse({'error': str(e)}, status=400)
-                else:
-                    context['status'] = f"Relief good is already '{relief_good_status}'"
+                except Exception as e:
+                    print(f"Error: {e}")
+                    return JsonResponse({'error': str(e)}, status=400)
 
             else:
                 context['error'] = 'QR code could not be decoded'
@@ -256,12 +251,81 @@ def handlerScanQR (request):
 
 
 def recipScanQR (request):
-    
-    
-    context = {
-        
-    }
-    
+    # Initialize an empty context dictionary
+    context = {}
+
+    relief_good_count = contract.functions.reliefGoodCount().call()
+    relief_goods = []
+    for i in range(1, relief_good_count + 1):
+        relief_good = contract.functions.getReliefGood(i).call()
+        relief_goods.append({
+            'id': relief_good[0],
+            'donor': relief_good[1],  # Assuming the address is already checksummed
+            'typeOfGood': relief_good[2],
+            'weight': relief_good[3],
+            'status': relief_good[4],
+            'recipient': relief_good[5]
+        })
+
+    relief_goods.reverse()  # Reverse the list if you want to display the latest first
+
+    # Combine both qr_code and relief_goods into the context
+    context['relief_goods'] = relief_goods
+
+    if request.method == 'POST':
+        form = qrForm(request.POST, request.FILES)
+        if form.is_valid():
+            qr_code_instance = form.save()
+            qr_image_path = qr_code_instance.qr_image.path
+            decoded_data = decode(Image.open(qr_image_path))
+            if decoded_data:
+                qr_code_data = decoded_data[0].data.decode('utf-8')
+                context['qr_code_data'] = qr_code_data
+                tx_receipt = qr_code_data[21:]
+                print(f"Transaction receipt: {tx_receipt}")
+
+                receipt = web3.eth.get_transaction_receipt(tx_receipt)
+                logs = receipt['logs']
+
+                # Find id created
+                try:
+                    for log in logs:
+                        decoded_log = contract.events.ReliefGoodCreated().process_log(log)
+                        relief_good_id = decoded_log['args']['id']
+                        print(f"Relief Good ID: {relief_good_id}")
+                        context['relief_good_id'] = relief_good_id
+                        break
+                except Exception as e:
+                    print(f"Error decoding log: {e}")
+                    context['error'] = 'Error decoding log'
+
+                # Update relief good status to delivered
+                try:
+                    username = request.session['username']
+                    print(f"Username: {username}")
+                    recipient_address = Web3.to_checksum_address(username)
+
+                    relief_good_status = "Delivered"
+                    tx_hash = contract.functions.updateReliefGoodDelivered(
+                        relief_good_id,
+                        relief_good_status,
+                        recipient_address,
+                    ).transact({'from': recipient_address})
+                        
+                    # Wait for the transaction to be mined
+                    receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
+                    print(f"Transaction receipt: {receipt}")
+                    context['status'] = f"Changed status to 'Delivered'"
+
+                except Exception as e:
+                    print(f"Error: {e}")
+                    return JsonResponse({'error': str(e)}, status=400)
+
+            else:
+                context['error'] = 'QR code could not be decoded'
+    else:
+        form = qrForm()
+    context['form'] = form
     return render(request, "AidLedgerMainPage/recipientDashboard.html", context)
 ###########################################################################################################
 
