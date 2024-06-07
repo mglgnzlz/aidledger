@@ -38,26 +38,11 @@ else:
 with open('../blockchain/build/contracts/AidLedger.json') as f:
     aid_ledger_json = json.load(f)
     contract_abi = aid_ledger_json['abi']
-    contract_address = "0x920dcFad3a5B3DF5b98335D632C97dE44083f5C7"
+    contract_address = "0x1dD5046A0b9543bF94874Cd5B77172531e45a4c6"
     print(f"Contract ABI: {contract_abi}")
 
 contract = web3.eth.contract(address=contract_address, abi=contract_abi)
 print(f"Contract: {contract}")
-
-# ABI of the ReliefGoodCreated event
-relief_good_created_event_abi = {
-    "anonymous": False,
-    "inputs": [
-        {"indexed": False, "name": "id", "type": "uint256"},
-        {"indexed": False, "name": "donor", "type": "address"},
-        {"indexed": False, "name": "typeOfGood", "type": "string"},
-        {"indexed": False, "name": "weight", "type": "string"},
-        {"indexed": False, "name": "status", "type": "string"},
-        {"indexed": False, "name": "recipient", "type": "address"}
-    ],
-    "name": "ReliefGoodCreated",
-    "type": "event"
-}
 
 # Test the function call
 try:
@@ -87,7 +72,8 @@ def govGenerateQR(request):
             'typeOfGood': relief_good[2],
             'weight': relief_good[3],
             'status': relief_good[4],
-            'recipient': relief_good[5]
+            'handler': relief_good[5],
+            'recipient': relief_good[6]
         })
 
     relief_goods.reverse()  # Reverse the list if you want to display the latest first
@@ -111,6 +97,7 @@ def create_relief_good(request):
         donor_address = Web3.to_checksum_address(username)
         
         recipient_address = "0x0000000000000000000000000000000000000000"
+        handler_address = "0x0000000000000000000000000000000000000000"
 
         # print(f"User: {user}")
         print(f"Donor Address: {donor_address}")
@@ -124,6 +111,7 @@ def create_relief_good(request):
                 rfg_type,
                 rfg_weight,
                 relief_good_status,
+                handler_address,
                 recipient_address
             ).transact({'from': donor_address})
             
@@ -189,7 +177,8 @@ def handlerScanQR (request):
             'typeOfGood': relief_good[2],
             'weight': relief_good[3],
             'status': relief_good[4],
-            'recipient': relief_good[5]
+            'handler': relief_good[5],
+            'recipient': relief_good[6]
         })
 
     relief_goods.reverse()  # Reverse the list if you want to display the latest first
@@ -229,9 +218,10 @@ def handlerScanQR (request):
                 try:
                     username = request.session['username']
                     handler_address = Web3.to_checksum_address(username)
-                    tx_hash = contract.functions.updateReliefGoodStatus(
+                    tx_hash = contract.functions.updateReliefGoodHandler(
                         relief_good_id,
                         relief_good_status,
+                        handler_address,
                     ).transact({'from': handler_address})
                         
                     # Wait for the transaction to be mined
@@ -265,7 +255,8 @@ def recipScanQR (request):
             'typeOfGood': relief_good[2],
             'weight': relief_good[3],
             'status': relief_good[4],
-            'recipient': relief_good[5]
+            'handler': relief_good[5],
+            'recipient': relief_good[6]
         })
 
     relief_goods.reverse()  # Reverse the list if you want to display the latest first
@@ -301,13 +292,11 @@ def recipScanQR (request):
                     context['error'] = 'Error decoding log'
 
                 # Update relief good status to delivered
+                relief_good_status = "Delivered"
                 try:
                     username = request.session['username']
-                    print(f"Username: {username}")
                     recipient_address = Web3.to_checksum_address(username)
-
-                    relief_good_status = "Delivered"
-                    tx_hash = contract.functions.updateReliefGoodDelivered(
+                    tx_hash = contract.functions.updateReliefGoodRecipient(
                         relief_good_id,
                         relief_good_status,
                         recipient_address,

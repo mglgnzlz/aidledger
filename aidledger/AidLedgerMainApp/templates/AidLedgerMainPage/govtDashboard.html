@@ -35,6 +35,7 @@
         <th>Type of Good</th>
         <th>Weight</th>
         <th>Status</th>
+        <th>Handler</th>
         <th>Recipient</th>
       </tr>
     </thead>
@@ -46,6 +47,7 @@
         <td>{{ good.typeOfGood }}</td>
         <td>{{ good.weight }}</td>
         <td>{{ good.status }}</td>
+        <td>{{ good.handler }}</td>
         <td>{{ good.recipient }}</td>
       </tr>
       {% endfor %}
@@ -54,32 +56,30 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var button = document.getElementById('downloadBtn'); // Corrected ID
-    button.addEventListener('click', function(event) {
-        event.preventDefault(); // Prevent the form from submitting normally
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', "{% url 'create_relief_good' %}", true); // Updated to use 'create_relief_good'
-        xhr.responseType = 'blob';
+  document.addEventListener("DOMContentLoaded", function () {
+    var button = document.getElementById("downloadBtn"); // Corrected ID
+    button.addEventListener("click", function (event) {
+      event.preventDefault(); // Prevent the form from submitting normally
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", "{% url 'create_relief_good' %}", true); // Updated to use 'create_relief_good'
+      xhr.responseType = "blob";
 
-        xhr.onload = function() {
-            if (this.status === 200) {
-                var blob = new Blob([this.response], { type: 'image/png' });
-                var downloadUrl = URL.createObjectURL(blob);
-                var a = document.createElement("a");
-                a.href = downloadUrl;
-                a.download = "qr_code.png";
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(downloadUrl);
-            }
-        };
+      xhr.onload = function () {
+        if (this.status === 200) {
+          var blob = new Blob([this.response], { type: "image/png" });
+          var downloadUrl = URL.createObjectURL(blob);
+          var a = document.createElement("a");
+          a.href = downloadUrl;
+          a.download = "qr_code.png";
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(downloadUrl);
+        }
+      };
 
-        xhr.send();
+      xhr.send();
     });
-});
-
-
+  });
 </script>
 
 {% endblock %}
