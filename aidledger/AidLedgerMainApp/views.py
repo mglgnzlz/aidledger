@@ -118,11 +118,12 @@ def create_relief_good(request):
         
         # Interact with the smart contract to create a new relief good
         try:
+            relief_good_status = "Prepared"
             tx_hash = contract.functions.createReliefGood(
                 donor_address,
                 rfg_type,
                 rfg_weight,
-                "In transit",
+                relief_good_status,
                 recipient_address
             ).transact({'from': donor_address})
             
@@ -224,7 +225,7 @@ def handlerScanQR (request):
                     context['error'] = 'Error decoding log'
 
                 # Update relief good status
-                relief_good_status = "Shipped"
+                relief_good_status = "In transit"
                 try:
                     username = request.session['username']
                     handler_address = Web3.to_checksum_address(username)
