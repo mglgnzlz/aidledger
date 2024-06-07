@@ -38,7 +38,7 @@ else:
 with open('../blockchain/build/contracts/AidLedger.json') as f:
     aid_ledger_json = json.load(f)
     contract_abi = aid_ledger_json['abi']
-    contract_address = "0xbd243C6E2D684Ea14A8eAE7821043b31cF000eE0"
+    contract_address = "0x920dcFad3a5B3DF5b98335D632C97dE44083f5C7"
     print(f"Contract ABI: {contract_abi}")
 
 contract = web3.eth.contract(address=contract_address, abi=contract_abi)

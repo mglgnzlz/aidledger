@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+<head>
   <link rel="stylesheet" type="text/css" href="/static/css/baseTemplate.css" />
   <link
     rel="stylesheet"
@@ -8,17 +9,15 @@
     crossorigin="anonymous"
     referrerpolicy="no-referrer"
   />
+</head>
+<body>
+  <div class="topnav">
+    <a href="">AidLedger</a>
+  </div>
+  <!-- <div class="sidebar">
+    {% block sidebar %} {% endblock %}
+  </div> -->
 
-  <body>
-    <div class="topnav">
-      <a href="">AidLedger</a>
-    </div>
-    <div class="divider"></div>
-    <div class="sidebar">
-      {% block sidebar %} {% endblock %}
-    </div>
-
-    <div class="content_section">{% block content %} {% endblock %}</div>
-  </body>
-  
+  <div class="content_section">{% block content %} {% endblock %}</div>
+</body>
 </html>

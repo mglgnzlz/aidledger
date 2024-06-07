@@ -1,29 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <link rel="stylesheet" type="text/css" href="/static/css/login.css" />
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Moralis Auth Django Demo</title>
+    <title>AidLedger - Login</title>
   </head>
   <body>
-    <div>
-      {% if user.is_authenticated %}
-      <h1>Welcome Moralis Web3 User, {{ user.username }} !</h1>
+    <div class="MainLoginBlock">
+      <div class="login-container">
+        {% if user.is_authenticated %}
+        <h1>Welcome Moralis Web3 User, {{ user.username }} !</h1>
 
-      <form method="POST" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button type="submit">logout</button>
-      </form>
+        <form method="POST" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit">logout</button>
+        </form>
 
-      <br />
-      <a href="{% url 'my_profile' %}"> My profile </a>
-      {% else %}
-      <h1>Moralis Web3 Login Django demo</h1>
-      <button class="btn" id="auth-metamask">
-        Login with Moralis Web3 API
-      </button>
-      {% endif %}
+        <br />
+        <a href="{% url 'my_profile' %}"> My profile </a>
+        {% else %}
+        <h1>AidLedger</h1>
+        <h2>
+          a proposed Ethereum-based Distribution and Tracking System for the
+          Pasig City DRRMO
+        </h2>
+        <!-- Subheading added here -->
+        <button class="btn" id="auth-metamask">Log In</button>
+        {% endif %}
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
