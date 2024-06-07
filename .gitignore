@@ -1,2 +1,12 @@
+# AidLedger
+aidledger/AidLedgerMainApp/__pycache__/*
+aidledger/AidLedgerMainApp/migrations/__pycache__/*
+aidledger/aidledger/__pycache__/*
+aidledger/db.sqlite3
+aidledger/media/qr_codes/*
+
+# Alvenv
 alvenv/
+
+# Blockchain
 blockchain/node_modules/
